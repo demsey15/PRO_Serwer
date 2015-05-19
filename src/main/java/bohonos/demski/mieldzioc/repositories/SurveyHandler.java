@@ -15,7 +15,7 @@ import bohonos.demski.mieldzioc.survey.Survey;
 
 /**
  *
- * @author Andrzej Bohonos
+ * @author Andrzej Bohonos i Dominik Demski
  */
 public class SurveyHandler {
     

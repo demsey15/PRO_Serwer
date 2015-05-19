@@ -74,7 +74,9 @@ public class ConnectionHandler implements Runnable{
 	public final static int SET_INTERVIEWER_CREATING_PRIVILIGES = 34;
 	
 	public final static int GET_ACTIVE_TEMPLATES_ID_FOR_INTERVIEWER = 35; //pobierz ankiety, które ankieter mo¿e wype³niaæ
-	public final static int GET_EDITABLE_TEMPLATES_ID_FOR_INTERVIEWER = 36; //pobierz ankiety, które ankieter mo¿e wype³niaæ
+	public final static int GET_EDITABLE_TEMPLATES_ID_FOR_INTERVIEWER = 36; //pobierz ankiety, które ankieter mo¿e edytowaæ
+	public final static int GET_SURVEY_TEMPLATE = 37;
+	
 	
 	private Socket incoming;
 	private Workers workers;
@@ -485,6 +487,27 @@ public class ConnectionHandler implements Runnable{
 						sendInt(OPERATION_OK);
 						editableId = surveyHandler.getSurveysIdForInterviewerToEdit(inter2);
 						sendObject(editableId);
+					}
+					break;
+				case GET_SURVEY_TEMPLATE:
+					String survId = readString();
+					Survey surv = surveyHandler.getSurvey(survId);
+					if(surv == null){
+						sendInt(BAD_DATA_FORMAT);
+						break;
+					}
+					else{
+						sendInt(OPERATION_OK);
+						int status = surveyHandler.getSurveyStatus(survId);
+						if(status == SurveyHandler.INACTIVE){
+							if(administrator == null){
+								sendInt(AUTHORIZATION_FAILED);
+							}
+							else{
+								sendInt(AUTHORIZATION_OK);
+								sendObject(surv);
+							}
+						}
 					}
 					break;
 				default:
