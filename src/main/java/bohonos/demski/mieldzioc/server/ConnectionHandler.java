@@ -465,8 +465,12 @@ public class ConnectionHandler implements Runnable{
 					}
 					else{
 						sendInt(OPERATION_OK);
+						System.out.println("No wysy³am no...");
 						activeId = surveyHandler.getSurveysIdForInterviewerToFill(inter);
-						sendObject(activeId);
+						sendInt(activeId.size());
+						for(String iddd : activeId){
+							sendString(iddd);
+						}
 					}
 					break;
 				case GET_EDITABLE_TEMPLATES_ID_FOR_INTERVIEWER:
@@ -482,11 +486,15 @@ public class ConnectionHandler implements Runnable{
 					Interviewer inter2 = workers.getInterviewer(idInter2);
 					if(inter2 == null){
 						sendInt(BAD_DATA_FORMAT);
+						break;
 					}
 					else{
 						sendInt(OPERATION_OK);
 						editableId = surveyHandler.getSurveysIdForInterviewerToEdit(inter2);
-						sendObject(editableId);
+						sendInt(editableId.size());
+						for(String idd : editableId){
+							sendString(idd);
+						}
 					}
 					break;
 				case GET_SURVEY_TEMPLATE:
@@ -530,6 +538,7 @@ public class ConnectionHandler implements Runnable{
 		try {
 			ObjectOutputStream outObject = new ObjectOutputStream(incoming.getOutputStream());
 			outObject.writeObject(obj);
+			System.out.println("Wysy³am obiekt " + obj);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

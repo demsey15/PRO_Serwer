@@ -152,4 +152,9 @@ public class Interviewer implements Serializable{
         this.relieveDay=null;
         setOutOfWorkTime(date, date2);
     }
+    
+    public static void main(String[] args) {
+		Interviewer interviewer = new Interviewer("", "", "11111111111", new GregorianCalendar());
+		System.out.println(interviewer.isActive());
+	}
 }
