@@ -371,7 +371,7 @@ public class ConnectionHandler implements Runnable{
 								sendInt(BAD_DATA_FORMAT); //jeœli nie ma takiej grupy ankiet
 							}
 							else{
-								interviewer.setPrivilegesForInterviewer(numberOfSurvey, privileges);
+							//	interviewer.setPrivilegesForInterviewer(numberOfSurvey, privileges);
 								sendInt(OPERATION_OK);
 							}
 						}
@@ -410,7 +410,7 @@ public class ConnectionHandler implements Runnable{
 					else{		//administrator mo¿e odczytaæ wszystkie uprawnienia
 						sendInt(AUTHORIZATION_OK);
 						
-						Interviewer interviewer = workers.getInterviewer(idOfInterviewer);
+						Interviewer interviewer = workers.getInterviewer(idInterv);
 						if(interviewer == null){
 							sendInt(BAD_DATA_FORMAT); //nie ma ankietera o przes³anym id
 							break;
@@ -431,7 +431,7 @@ public class ConnectionHandler implements Runnable{
 					else{		
 						sendInt(AUTHORIZATION_OK);
 						
-						Interviewer interviewer = workers.getInterviewer(idOfInterviewer);
+						Interviewer interviewer = workers.getInterviewer(idIn);
 						if(interviewer == null){
 							sendInt(BAD_DATA_FORMAT); //nie ma ankietera o przes³anym id
 							break;

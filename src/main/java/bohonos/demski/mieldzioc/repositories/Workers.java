@@ -20,9 +20,13 @@ public class Workers {
 	ConcurrentHashMap<String, String> administartors = new ConcurrentHashMap<String, String>();
 	
 	public Workers(){
-		Interviewer interviewer = new Interviewer("", "", "92110908338", new GregorianCalendar());
+		Interviewer interviewer = new Interviewer("", "", "12345678999", new GregorianCalendar());
 		interviewer.setInterviewerPrivileges(true);
 		interviewers.put(interviewer, "abc");
+		
+		Interviewer interviewer2 = new Interviewer("", "", "11111111111", new GregorianCalendar());
+		interviewer2.setInterviewerPrivileges(false);
+		interviewers.put(interviewer2, "abc");
 		administartors.put("admin", "admin");
 	}
 	
