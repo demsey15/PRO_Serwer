@@ -99,10 +99,7 @@ public class InterviewersRepository {
    * @return true or false
    */
   public boolean equalsInterviewers(Interviewer man1,Interviewer man2){
-      if(man1.getId()==man2.getId())
-          return true;
-      else
-          return false;
+        return man1.getId().equals(man2.getId());
   }
   //edytowanie listy , usuwanie ankieterów i te sprawy trzeba dodaæ
 }

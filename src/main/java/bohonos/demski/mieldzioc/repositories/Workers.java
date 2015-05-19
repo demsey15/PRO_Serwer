@@ -48,7 +48,7 @@ public class Workers {
 				i++;
 			}
 		}
-		if(rightPassword == null) return false;
+		if(rightPassword == null) return false;    //brak u¿ytkownika o podanym id
 		if(rightPassword.length != password.length){
 			for(int i = 0; i < rightPassword.length; i++){
 				rightPassword[i] = 'a';

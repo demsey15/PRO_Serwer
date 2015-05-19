@@ -371,7 +371,7 @@ public class ConnectionHandler implements Runnable{
 								sendInt(BAD_DATA_FORMAT); //jeœli nie ma takiej grupy ankiet
 							}
 							else{
-							//	interviewer.setPrivilegesForInterviewer(numberOfSurvey, privileges);
+								interviewer.setPrivilegesForInterviewer(idOfSurveys, privileges);
 								sendInt(OPERATION_OK);
 							}
 						}
@@ -392,10 +392,10 @@ public class ConnectionHandler implements Runnable{
 						}
 						else{
 							sendInt(OPERATION_OK);
-							Map<Integer, InterviewerSurveyPrivileges> map = 
+							Map<String, InterviewerSurveyPrivileges> map = 
 									interviewer.getIntervSurveyPrivileges();
 							if(map == null){
-								map = new HashMap<Integer, InterviewerSurveyPrivileges>();
+								map = new HashMap<String, InterviewerSurveyPrivileges>();
 							}
 							sendObject(map); //wyœlij wszystkie uprawnienia u¿ytkownika, nie przesy³a null
 											//najwy¿ej pust¹ mapê
