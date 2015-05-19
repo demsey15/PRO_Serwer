@@ -3,10 +3,14 @@
  */
 package bohonos.demski.mieldzioc.repositories;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import bohonos.demski.mieldzioc.interviewer.Interviewer;
+import bohonos.demski.mieldzioc.interviewer.InterviewerSurveyPrivileges;
 import bohonos.demski.mieldzioc.survey.Survey;
 
 /**
@@ -178,4 +182,55 @@ public class SurveyHandler {
         }
         return statusSurveysId;
     }     
+    
+    /**
+     * @author Dominik Demski
+     * returns map of surveysId and surveys with given status
+     * @param status given status
+     * @return map of surveysId and surveys
+     */
+    public List<String> getStatusSurveysIdForInterviewer(int status, 
+    		Interviewer interviewer)
+    {
+       List<String> result = new ArrayList<String>();
+       Map<String, Survey> statusSurveys = getStatusSurveysId(status); //wszystkie ankiety z danym statusem.
+       if(statusSurveys == null) return result;
+       Map<String, InterviewerSurveyPrivileges> map = interviewer.getIntervSurveyPrivileges(); //ankiety, do których u¿ytkownik ma jakieœ uprawnienia.
+       if(map == null) return result;
+       for(String id : map.keySet()){
+    	   if(statusSurveys.containsKey(id)){ //jeœli ankieta jest odpowiedniego statusu
+    		   InterviewerSurveyPrivileges p = map.get(id);
+    		   if(status == SurveyHandler.ACTIVE){
+    			   if(p.isFilling()) result.add(id);
+    		   }
+    		   else if(status == SurveyHandler.IN_PROGRESS){
+    			   if(p.isEditing()) result.add(id);
+    		   }
+    	   }
+       }
+       return result;
+       }
+    /**
+     * Pobiera id ankiet, do których ankieter ma uprawnienia do wype³niania. Nie zwraca null,
+     * najwy¿ej pust¹ listê.
+     * @author Dominik Demski
+     * @param interviewer
+     * @return
+     */
+    public List<String> getSurveysIdForInterviewerToFill(Interviewer interviewer){
+    	return getStatusSurveysIdForInterviewer(ACTIVE, interviewer);
+    }
+    
+    /**
+     * Pobiera id ankiet, do których ankieter ma uprawnienia do edytowania. Nie zwraca null,
+     * najwy¿ej pust¹ listê.
+     * @author Dominik Demski
+     * @param interviewer
+     * @return
+     */
+    public List<String> getSurveysIdForInterviewerToEdit(Interviewer interviewer){
+    	return getStatusSurveysIdForInterviewer(IN_PROGRESS, interviewer);
+    }
+    
+    
 }

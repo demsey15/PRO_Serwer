@@ -41,7 +41,8 @@ public class Workers {
 			Enumeration<Interviewer> enumeration = interviewers.keys();
 			while(! goOn && i < interviewers.size()){
 				Interviewer interviewer;
-				if((interviewer = enumeration.nextElement()).getId().equals(id)){
+				if((interviewer = enumeration.nextElement()).getId().equals(id) && 
+						interviewer.isActive()){  //jeœli ankieter nie zosta³ zwolniony
 					goOn = true;
 					rightPassword = interviewers.get(interviewer).toCharArray();
 				}

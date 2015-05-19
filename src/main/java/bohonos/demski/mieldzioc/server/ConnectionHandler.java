@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +72,9 @@ public class ConnectionHandler implements Runnable{
 	public final static int GET_INTERVIEWER_PRIVILAGES = 32;
 	public final static int GET_INTERVIEWER_CREATING_PRIVILIGES = 33;
 	public final static int SET_INTERVIEWER_CREATING_PRIVILIGES = 34;
+	
+	public final static int GET_ACTIVE_TEMPLATES_ID_FOR_INTERVIEWER = 35; //pobierz ankiety, które ankieter mo¿e wype³niaæ
+	public final static int GET_EDITABLE_TEMPLATES_ID_FOR_INTERVIEWER = 36; //pobierz ankiety, które ankieter mo¿e wype³niaæ
 	
 	private Socket incoming;
 	private Workers workers;
@@ -442,6 +446,46 @@ public class ConnectionHandler implements Runnable{
 							interviewer.setInterviewerPrivileges(can == 1); //przesy³a 1, jeœli ankieter mo¿e tworzyæ ankiety, inaczej 0
 							}
 						}
+					break;
+				case GET_ACTIVE_TEMPLATES_ID_FOR_INTERVIEWER:
+					List<String> activeId = new ArrayList<String>();
+					String idInter = readString();
+					if(interviewer != null){
+						if(!interviewer.getId().equals(idInter)){	//ankieter mo¿e odebraæ tylko swoje ankiety
+							sendInt(AUTHORIZATION_FAILED);
+							break;
+						}
+					}
+					sendInt(AUTHORIZATION_OK);
+					Interviewer inter = workers.getInterviewer(idInter);
+					if(inter == null){
+						sendInt(BAD_DATA_FORMAT);
+					}
+					else{
+						sendInt(OPERATION_OK);
+						activeId = surveyHandler.getSurveysIdForInterviewerToFill(inter);
+						sendObject(activeId);
+					}
+					break;
+				case GET_EDITABLE_TEMPLATES_ID_FOR_INTERVIEWER:
+					List<String> editableId = new ArrayList<String>();
+					String idInter2 = readString();
+					if(interviewer != null){
+						if(!interviewer.getId().equals(idInter2)){	//ankieter mo¿e odebraæ tylko swoje ankiety
+							sendInt(AUTHORIZATION_FAILED);
+							break;
+						}
+					}
+					sendInt(AUTHORIZATION_OK);
+					Interviewer inter2 = workers.getInterviewer(idInter2);
+					if(inter2 == null){
+						sendInt(BAD_DATA_FORMAT);
+					}
+					else{
+						sendInt(OPERATION_OK);
+						editableId = surveyHandler.getSurveysIdForInterviewerToEdit(inter2);
+						sendObject(editableId);
+					}
 					break;
 				default:
 					break;
