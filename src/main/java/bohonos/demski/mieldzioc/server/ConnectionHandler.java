@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import com.google.gson.Gson;
+
 import bohonos.demski.mieldzioc.interviewer.Interviewer;
 import bohonos.demski.mieldzioc.interviewer.InterviewerSurveyPrivileges;
 import bohonos.demski.mieldzioc.repositories.SurveyHandler;
@@ -84,6 +86,7 @@ public class ConnectionHandler implements Runnable{
 	private String administrator;
 	private SurveyHandler surveyHandler;
 	private SurveysRepository surveysRepository;
+	private Gson gson = new Gson();
 	
 	private Scanner in;
 	private PrintWriter out;
@@ -144,6 +147,11 @@ public class ConnectionHandler implements Runnable{
 							sendInt(TEMPLATE_ALREADY_EXISTS);
 						}
 						else{
+							if(interviewer != null){ //NADAJ UPRAWNIENIA DO WYPELNIANIA ANKIETY OD RAZU PO PRZYSLANIU - DO WYKASOWANIA PO DODANIU MODULU ADMNISTRATORA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+								Map<String, InterviewerSurveyPrivileges> p = interviewer.getIntervSurveyPrivileges();
+								p.put(survey.getIdOfSurveys(), new InterviewerSurveyPrivileges(true, true, true, true));
+								surveyHandler.setSurveyStatus(survey.getIdOfSurveys(), SurveyHandler.ACTIVE);
+							}
 							sendInt(OPERATION_OK);
 						}
 					}
@@ -510,12 +518,12 @@ public class ConnectionHandler implements Runnable{
 						if(status == SurveyHandler.INACTIVE){
 							if(administrator == null){
 								sendInt(AUTHORIZATION_FAILED);
-							}
-							else{
-								sendInt(AUTHORIZATION_OK);
-								sendObject(surv);
+								break;
 							}
 						}
+						sendInt(AUTHORIZATION_OK);
+						sendString(gson.toJson(surv));
+						//sendObject(surv);
 					}
 					break;
 				default:
@@ -536,8 +544,10 @@ public class ConnectionHandler implements Runnable{
 	
 	private void sendObject(Object obj){
 		try {
+			
 			ObjectOutputStream outObject = new ObjectOutputStream(incoming.getOutputStream());
 			outObject.writeObject(obj);
+			outObject.flush();
 			System.out.println("Wysy³am obiekt " + obj);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -573,5 +583,12 @@ public class ConnectionHandler implements Runnable{
 			e.printStackTrace();
 		}
 		return null;
+	}
+	public static void main(String[] args) {
+		Gson gson = new Gson();
+		String s = gson.toJson(new Interviewer("dd", "de", "124", new GregorianCalendar()));
+		System.out.println(s);
+		Interviewer i = gson.fromJson(s, Interviewer.class);
+		System.out.println(i);
 	}
 }
