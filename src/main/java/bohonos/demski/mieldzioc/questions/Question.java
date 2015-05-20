@@ -15,6 +15,7 @@ import com.rits.cloning.Cloner;
  */
 public abstract class Question implements Serializable, Cloneable{
 	
+
 	/**
 	 * 
 	 */
@@ -27,6 +28,8 @@ public abstract class Question implements Serializable, Cloneable{
 	public static final int SCALE_QUESTION = 5;
 	public static final int DATE_QUESTION = 6;
 	public static final int TIME_QUESTION = 7;
+	
+	
 	
 	/**
 	 * Zwraca typ pytania (patrz sta³e w klasie Question).
@@ -47,12 +50,17 @@ public abstract class Question implements Serializable, Cloneable{
 	}
 	
 	private boolean obligatory;
-	private String errorMessage;
-	private String hint;
-	private String pictureUrl;
-	private String question;
+	private String errorMessage = "";
+	private String hint = "";
+	private String pictureUrl = "";
+	private String question = "";
 	
 	
+	
+	public Question() {
+		
+	}
+
 	public Question(String question){
 		this(question, true);
 	}
@@ -74,6 +82,8 @@ public abstract class Question implements Serializable, Cloneable{
 	public String getQuestion() {
 		return question;
 	}
+	
+	public abstract String toJson();
 
 	/**
 	 *  Set text of question.

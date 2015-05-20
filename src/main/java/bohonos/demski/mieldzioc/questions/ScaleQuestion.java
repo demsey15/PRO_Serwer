@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.gson.Gson;
 import com.rits.cloning.Cloner;
 
 /**
@@ -23,6 +24,9 @@ public class ScaleQuestion extends Question {
 	private int userAnswer = Integer.MIN_VALUE;  //Integer.MIN_VALUE - there is no user's answer
 	
 	
+	public ScaleQuestion(){
+		
+	}
 	public int getMinValue() {
 		return minValue;
 	}
@@ -191,6 +195,11 @@ public class ScaleQuestion extends Question {
 		List<String> list = new ArrayList<String>(1);
 		if(isAnswered()) list.add(String.valueOf(userAnswer));
 		return list;
+	}
+	
+	@Override
+	public String toJson() {
+		return (new Gson()).toJson(this);
 	}
 
 }

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.gson.Gson;
 import com.rits.cloning.Cloner;
 
 import bohonos.demski.mieldzioc.common.Pair;
@@ -24,6 +25,14 @@ public class GridQuestion extends Question {
 	private List<String> columnLabels = new ArrayList<String>();
 	private List<String> rowLabels = new ArrayList<String>();
 	private List<Pair<Integer, Integer>> userAnswers = new ArrayList<Pair<Integer, Integer>>();  //Pair<rowNumber, columnNumber>
+
+
+	
+	
+	public GridQuestion() {
+		super();
+		
+	}
 
 	/**
 	 * Create GridQuestion object with obligatory as true.
@@ -235,6 +244,11 @@ public class GridQuestion extends Question {
 	@Override
 	public GridQuestion clone() throws CloneNotSupportedException {
 		return (new Cloner()).deepClone(this);
+	}
+
+	@Override
+	public String toJson() {
+		return (new Gson()).toJson(this);
 	}
 
 }

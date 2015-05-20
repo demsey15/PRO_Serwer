@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.gson.Gson;
 import com.rits.cloning.Cloner;
 
 /**
@@ -24,6 +25,9 @@ public class OneChoiceQuestion extends Question {
 	private boolean isDropDownList;
 	
 	
+	public OneChoiceQuestion(){
+		
+	}
 	/**
 	 * Create OneChoiceQuestion object with isDropDownList as false and obligatory as true.
 	 * @param question text of question
@@ -221,5 +225,9 @@ public class OneChoiceQuestion extends Question {
 		return list;
 	}
 
+	@Override
+	public String toJson() {
+		return (new Gson()).toJson(this);
+	}
 
 }

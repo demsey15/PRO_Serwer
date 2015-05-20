@@ -16,14 +16,19 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import com.google.gson.Gson;
-
+import bohonos.demski.mieldzioc.constraints.IConstraint;
+import bohonos.demski.mieldzioc.constraints.NumberConstraint;
+import bohonos.demski.mieldzioc.constraints.TextConstraint;
 import bohonos.demski.mieldzioc.interviewer.Interviewer;
 import bohonos.demski.mieldzioc.interviewer.InterviewerSurveyPrivileges;
+import bohonos.demski.mieldzioc.questions.Question;
+import bohonos.demski.mieldzioc.questions.TextQuestion;
 import bohonos.demski.mieldzioc.repositories.SurveyHandler;
 import bohonos.demski.mieldzioc.repositories.SurveysRepository;
 import bohonos.demski.mieldzioc.repositories.Workers;
 import bohonos.demski.mieldzioc.survey.Survey;
+
+import com.google.gson.Gson;
 
 /**
  * @author Dominik Demski
@@ -522,7 +527,8 @@ public class ConnectionHandler implements Runnable{
 							}
 						}
 						sendInt(AUTHORIZATION_OK);
-						sendString(gson.toJson(surv));
+						sendSurveyTemplate(surv);
+						//sendString(gson.toJson(surv));
 						//sendObject(surv);
 					}
 					break;
@@ -555,6 +561,7 @@ public class ConnectionHandler implements Runnable{
 	}
 	
 	private void sendString(String s){
+		System.out.println("Wysy³am: " + s);
 		out.println(s);
 	}
 	
@@ -583,6 +590,41 @@ public class ConnectionHandler implements Runnable{
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	private void sendSurveyTemplate(Survey survey){
+		sendString(survey.getTitle());
+		sendString(survey.getDescription());
+		sendString(survey.getSummary());
+		sendString(survey.getIdOfSurveys());
+		Gson gson = new Gson();
+		sendString(gson.toJson(survey.getInterviewer()));
+		int i = survey.questionListSize();
+		sendInt(i);
+		for(int j = 0; j < i; j++){
+			Question question = survey.getQuestion(j);
+			int type = question.getQuestionType();
+			sendInt(type);
+			if(type == Question.TEXT_QUESTION){
+				TextQuestion txt = (TextQuestion) question;
+				sendString(txt.getErrorMessage());
+				sendString(txt.getHint());
+				sendString(txt.getPictureURL());
+				sendString(txt.getQuestion());
+				IConstraint constraint = txt.getConstraint();
+				if(constraint instanceof TextConstraint){
+					sendString("text");
+					sendString(gson.toJson(((TextConstraint) constraint)));
+				}
+				else{
+					sendString("number");
+					sendString(gson.toJson(((NumberConstraint) constraint)));
+				}
+			}
+			else{
+				sendString(question.toJson());
+			}
+		}
 	}
 	public static void main(String[] args) {
 		Gson gson = new Gson();

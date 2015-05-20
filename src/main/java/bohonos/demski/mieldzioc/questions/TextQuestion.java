@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.gson.Gson;
 import com.rits.cloning.Cloner;
 
 import bohonos.demski.mieldzioc.constraints.IConstraint;
@@ -28,7 +29,9 @@ public class TextQuestion extends Question {
 	private String userAnswer;
 	private IConstraint constraint;
 	
-	
+	public TextQuestion(){
+		
+	}
 	
 	/**
 	 * Create TextQuestion object with no constraint and obligatory as true.
@@ -146,5 +149,10 @@ public class TextQuestion extends Question {
 		List<String> list = new ArrayList<String>(1);
 		if(isAnswered()) list.add(userAnswer);
 		return list;
+	}
+	
+	@Override
+	public String toJson() {
+		return "";
 	}
 }

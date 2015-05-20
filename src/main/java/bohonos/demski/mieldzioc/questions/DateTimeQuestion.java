@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.gson.Gson;
 import com.rits.cloning.Cloner;
 
 /**
@@ -26,6 +27,14 @@ public class DateTimeQuestion extends Question {
 	private boolean onlyTime;
 	private boolean onlyDate;
 	
+	
+	
+	public DateTimeQuestion() {
+		super();
+	
+	}
+
+
 	/**
 	 * Create DataTimeQuestion object with both onlyTime and onlyDate as false and obligatory as true.
 	 * @param question text of question
@@ -191,6 +200,13 @@ public class DateTimeQuestion extends Question {
 			}
 		}
 		return list;
+	}
+
+
+	@Override
+	public String toJson() {
+		Gson gson = new Gson();
+		return gson.toJson(this);
 	}
 
 }
