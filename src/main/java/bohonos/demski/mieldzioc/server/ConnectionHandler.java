@@ -15,13 +15,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import bohonos.demski.mieldzioc.constraints.IConstraint;
 import bohonos.demski.mieldzioc.constraints.NumberConstraint;
 import bohonos.demski.mieldzioc.constraints.TextConstraint;
 import bohonos.demski.mieldzioc.interviewer.Interviewer;
 import bohonos.demski.mieldzioc.interviewer.InterviewerSurveyPrivileges;
+import bohonos.demski.mieldzioc.questions.DateTimeQuestion;
+import bohonos.demski.mieldzioc.questions.GridQuestion;
+import bohonos.demski.mieldzioc.questions.MultipleChoiceQuestion;
+import bohonos.demski.mieldzioc.questions.OneChoiceQuestion;
 import bohonos.demski.mieldzioc.questions.Question;
+import bohonos.demski.mieldzioc.questions.ScaleQuestion;
 import bohonos.demski.mieldzioc.questions.TextQuestion;
 import bohonos.demski.mieldzioc.repositories.SurveyHandler;
 import bohonos.demski.mieldzioc.repositories.SurveysRepository;
@@ -143,7 +149,8 @@ public class ConnectionHandler implements Runnable{
 					}
 					else sendInt(AUTHORIZATION_OK);   //zalogowany jest administrator
 					
-					Object object = readObject();
+					//Object object = readObject();
+					Survey object = receiveSurveyTemplate();
 					if(object == null) sendInt(INVALID_NULL_REFERENCE);
 					else{
 						Survey survey = (Survey) object;     //odbierz ankietê
@@ -592,6 +599,7 @@ public class ConnectionHandler implements Runnable{
 		return null;
 	}
 	
+	
 	private void sendSurveyTemplate(Survey survey){
 		sendString(survey.getTitle());
 		sendString(survey.getDescription());
@@ -614,11 +622,20 @@ public class ConnectionHandler implements Runnable{
 				IConstraint constraint = txt.getConstraint();
 				if(constraint instanceof TextConstraint){
 					sendString("text");
-					sendString(gson.toJson(((TextConstraint) constraint)));
+					TextConstraint textConst = (TextConstraint) constraint;
+					sendString((textConst.getMaxLength() == null)? "null" : "" + textConst.getMaxLength());
+					sendString((textConst.getMinLength() == null)? "null" : "" + textConst.getMinLength());
+					sendString((textConst.getRegex() == null)? "null" : textConst.getRegex().pattern());
 				}
 				else{
 					sendString("number");
-					sendString(gson.toJson(((NumberConstraint) constraint)));
+					NumberConstraint numbConst = (NumberConstraint) constraint;
+					sendString((numbConst.getMaxValue() == null)? "null" : "" + numbConst.getMaxValue());
+					sendString((numbConst.getMinValue() == null)? "null" : "" + numbConst.getMinValue());
+					sendString((numbConst.getNotEquals() == null)? "null" : "" + numbConst.getNotEquals());
+					sendString((numbConst.isMustBeInteger())? "true" : "false");
+					sendString((numbConst.isNotBetweenMaxAndMinValue())? "true" : "false");
+					System.out.println("Ograniczenie liczbowe min: " + ((((NumberConstraint) constraint).getMinValue() == null)? "null" : ((NumberConstraint) constraint).getMinValue()));
 				}
 			}
 			else{
@@ -626,6 +643,71 @@ public class ConnectionHandler implements Runnable{
 			}
 		}
 	}
+	
+	private Survey receiveSurveyTemplate(){
+		Survey survey = new Survey(null);
+		String read1;
+		survey.setTitle(((read1 = readString()) == null)? null : read1);
+		survey.setDescription(((read1 = readString()) == null)? null : read1);
+		survey.setSummary(((read1 = readString()) == null)? null : read1);
+		survey.setIdOfSurveys(readString());
+		Gson gson = new Gson();
+		survey.setInterviewer(gson.fromJson(readString(), Interviewer.class));
+	
+		int i = readInt();
+		for(int j = 0; j < i; j++){
+			int type = readInt();
+			Question question;
+			if(type == Question.DATE_QUESTION || type == Question.TIME_QUESTION){
+				question = gson.fromJson(readString(), DateTimeQuestion.class);
+			}
+			else if(type == Question.DROP_DOWN_QUESTION || type == Question.ONE_CHOICE_QUESTION){
+				question = gson.fromJson(readString(), OneChoiceQuestion.class);
+			}
+			else if(type == Question.GRID_QUESTION){
+				question = gson.fromJson(readString(), GridQuestion.class);
+			}
+			else if(type == Question.MULTIPLE_CHOICE_QUESTION){
+				question = gson.fromJson(readString(), MultipleChoiceQuestion.class);
+			}
+			else if(type == Question.SCALE_QUESTION){
+				question = gson.fromJson(readString(), ScaleQuestion.class);
+			}
+			else{
+				TextQuestion txt = new TextQuestion();
+				txt.setErrorMessage(readString());
+				txt.setHint(readString());
+				txt.setPictureURL(readString());
+				txt.setQuestion(readString());
+				IConstraint constraint;
+				String s = readString();
+				if(s.equals("text")){
+					String read;
+					Integer maxLength = ((read = readString()).equals("null"))? null : Integer.parseInt(read);
+					Integer minLength = ((read = readString()).equals("null"))? null : Integer.parseInt(read);
+					String regexS = ((read = readString()).equals("null"))? null : read;
+					Pattern regex = null;
+					if(regexS != null)
+						regex = Pattern.compile(regexS);
+					constraint = new TextConstraint(minLength, maxLength, regex);
+				}
+				else{
+					String read;
+					Double maxValue = ((read = readString()).equals("null"))? null : Double.parseDouble(read);
+					Double minValue = ((read = readString()).equals("null"))? null : Double.parseDouble(read);
+					Double notEquals = ((read = readString()).equals("null"))? null : Double.parseDouble(read);
+					boolean mustBeInteger = Boolean.valueOf(readString());
+					boolean notBetweenMaxAndMinValue = Boolean.valueOf(readString());
+					constraint = new NumberConstraint(minValue, maxValue, mustBeInteger, notEquals, notBetweenMaxAndMinValue);
+				}
+				txt.setConstraint(constraint);
+				question = txt;
+			}
+			survey.addQuestion(question);
+		}
+		return survey;
+	}
+	
 	public static void main(String[] args) {
 		Gson gson = new Gson();
 		String s = gson.toJson(new Interviewer("dd", "de", "124", new GregorianCalendar()));
