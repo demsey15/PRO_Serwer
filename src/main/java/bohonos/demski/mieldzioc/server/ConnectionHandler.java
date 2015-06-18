@@ -204,24 +204,22 @@ public class ConnectionHandler implements Runnable{
 				case SEND_FILLED_SURVEYS:
 					if(interviewer == null) sendInt(AUTHORIZATION_FAILED);  //tylko ankieter mo¿e przes³aæ wype³nione ankiety
 					else{
-						int numberOfSurveys = readInt();
-						for(int i = 0; i < numberOfSurveys; i++){
-							Object o = readObject();
-							if(o == null) sendInt(INVALID_NULL_REFERENCE);
-							else{
-								Survey s = (Survey) o;
-								if(surveyHandler.getSurveyStatus(s.getIdOfSurveys())	//je¿eli mo¿na dodawaæ ankiety 
+						sendInt(AUTHORIZATION_OK);
+						
+						Survey survey = receiveFilledSurvey();
+							
+						if(survey == null) sendInt(INVALID_NULL_REFERENCE);
+						else{
+							if(surveyHandler.getSurveyStatus(survey.getIdOfSurveys())	//je¿eli mo¿na dodawaæ ankiety 
 										== SurveyHandler.ACTIVE){
-									if(!surveysRepository.addNewSurvey(s)){
-										sendInt(BAD_DATA_FORMAT);
-									}
-									else sendInt(OPERATION_OK);
+								if(!surveysRepository.addNewSurvey(survey)){
+									sendInt(BAD_DATA_FORMAT);
 								}
-								else sendInt(SURVEY_INACTIVE);
+								else sendInt(OPERATION_OK);
 							}
-								
-							}
-						}
+							else sendInt(SURVEY_INACTIVE);
+						}	
+					}
 					break;
 				case GET_ACTIVE_SURVEY_TEMPLATE:
 					Set<Survey> surveys = surveyHandler.
@@ -642,6 +640,27 @@ public class ConnectionHandler implements Runnable{
 				sendString(question.toJson());
 			}
 		}
+	}
+	
+	private Survey receiveFilledSurvey(){
+		Survey survey = receiveSurveyTemplate();
+		int surveyNumber = readInt();
+		survey.setNumberOfSurvey(surveyNumber);
+		Gson gson = new Gson();
+		GregorianCalendar from = gson.fromJson(readString(), GregorianCalendar.class);
+		GregorianCalendar to = gson.fromJson(readString(), GregorianCalendar.class);
+		survey.setStartTime(from);
+		survey.setFinishTime(to);
+		
+		for(int i = 0; i < survey.questionListSize(); i++){
+			int amount = readInt();
+			List<String> answers = new ArrayList<String>(amount);
+			for(int j = 0; j < amount; j++){
+				answers.add(readString());
+			}
+			survey.getQuestion(i).setUserAnswers(answers);
+		}
+		return survey;
 	}
 	
 	private Survey receiveSurveyTemplate(){

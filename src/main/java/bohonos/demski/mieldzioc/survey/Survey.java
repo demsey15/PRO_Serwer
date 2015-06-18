@@ -3,15 +3,15 @@
  */
 package bohonos.demski.mieldzioc.survey;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.io.Serializable;
+
+import com.rits.cloning.Cloner;
 
 import bohonos.demski.mieldzioc.interviewer.Interviewer;
 import bohonos.demski.mieldzioc.questions.Question;
-
-import com.rits.cloning.Cloner;
 
 /**
  * @author Andrzej Bohonos
@@ -326,7 +326,24 @@ public class Survey implements Serializable, Cloneable {
             return false;
     }
     
+    
     /**
+     * @author Dominik Demski
+     * @param startTime
+     */
+    public void setStartTime(GregorianCalendar startTime) {
+		this.startTime = startTime;
+	}
+
+    /**
+     * @author Dominik Demski
+     * @param finishTime
+     */
+	public void setFinishTime(GregorianCalendar finishTime) {
+		this.finishTime = finishTime;
+	}
+
+	/**
      * 
      * @return
      * @throws CloneNotSupportedException 

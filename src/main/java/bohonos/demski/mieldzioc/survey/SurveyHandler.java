@@ -6,6 +6,7 @@ package bohonos.demski.mieldzioc.survey;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  *
  * @author Andrzej Bohonos
@@ -243,5 +244,7 @@ public class SurveyHandler {
         this.maxSurveysId = maxSurveysId;
         
     }
+    
+
     
 }
