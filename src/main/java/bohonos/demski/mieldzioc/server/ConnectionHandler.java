@@ -299,7 +299,7 @@ public class ConnectionHandler implements Runnable{
 							sendInt(SENDING_FILLED_SURVEYS); //wysy³am ankiety (s¹ jakieœ wype³nione)
 							sendInt(filledSurveys.size()); //wysy³am liczbê wype³nionych ankiet
 							for(Survey s : filledSurveys){  //wysy³am ankiety
-								sendObject(s);
+								sendFilledSurvey(s);
 							}
 							sendInt(OPERATION_OK);
 						}
@@ -638,6 +638,25 @@ public class ConnectionHandler implements Runnable{
 			}
 			else{
 				sendString(question.toJson());
+			}
+		}
+	}
+	
+	private void sendFilledSurvey(Survey survey){
+		sendSurveyTemplate(survey);
+		
+		sendInt(survey.getNumberOfSurvey());
+	
+		Gson gson = new Gson();
+		sendString(gson.toJson(survey.getStartTime()));
+		sendString(gson.toJson(survey.getFinishTime()));
+		
+		for(int i = 0; i < survey.questionListSize(); i++){
+			List<String> answers = survey.getQuestion(i).getUserAnswersAsStringList();
+			sendInt(answers.size());
+			
+			for(int j = 0; j < answers.size(); j++){
+				sendString(answers.get(j));
 			}
 		}
 	}
