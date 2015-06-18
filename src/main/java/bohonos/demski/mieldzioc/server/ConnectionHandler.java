@@ -647,13 +647,16 @@ public class ConnectionHandler implements Runnable{
 		int surveyNumber = readInt();
 		survey.setNumberOfSurvey(surveyNumber);
 		Gson gson = new Gson();
-		GregorianCalendar from = gson.fromJson(readString(), GregorianCalendar.class);
+		String fromString = readString();
+		System.out.println("Odczyta³em datê: " + fromString);
+		GregorianCalendar from = gson.fromJson(fromString, GregorianCalendar.class);
 		GregorianCalendar to = gson.fromJson(readString(), GregorianCalendar.class);
 		survey.setStartTime(from);
 		survey.setFinishTime(to);
 		
 		for(int i = 0; i < survey.questionListSize(); i++){
 			int amount = readInt();
+			System.out.println("W pytaniu: " + i + " mam " + amount + " odpowiedzi");
 			List<String> answers = new ArrayList<String>(amount);
 			for(int j = 0; j < amount; j++){
 				answers.add(readString());
