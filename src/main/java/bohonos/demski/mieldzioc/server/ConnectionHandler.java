@@ -618,23 +618,26 @@ public class ConnectionHandler implements Runnable{
 				sendString(txt.getPictureURL());
 				sendString(txt.getQuestion());
 				IConstraint constraint = txt.getConstraint();
-				if(constraint instanceof TextConstraint){
-					sendString("text");
-					TextConstraint textConst = (TextConstraint) constraint;
-					sendString((textConst.getMaxLength() == null)? "null" : "" + textConst.getMaxLength());
-					sendString((textConst.getMinLength() == null)? "null" : "" + textConst.getMinLength());
-					sendString((textConst.getRegex() == null)? "null" : textConst.getRegex().pattern());
+				if(constraint != null){
+					if(constraint instanceof TextConstraint){
+						sendString("text");
+						TextConstraint textConst = (TextConstraint) constraint;
+						sendString((textConst.getMaxLength() == null)? "null" : "" + textConst.getMaxLength());
+						sendString((textConst.getMinLength() == null)? "null" : "" + textConst.getMinLength());
+						sendString((textConst.getRegex() == null)? "null" : textConst.getRegex().pattern());
+					}
+					else{
+						sendString("number");
+						NumberConstraint numbConst = (NumberConstraint) constraint;
+						sendString((numbConst.getMaxValue() == null)? "null" : "" + numbConst.getMaxValue());
+						sendString((numbConst.getMinValue() == null)? "null" : "" + numbConst.getMinValue());
+						sendString((numbConst.getNotEquals() == null)? "null" : "" + numbConst.getNotEquals());
+						sendString((numbConst.isMustBeInteger())? "true" : "false");
+						sendString((numbConst.isNotBetweenMaxAndMinValue())? "true" : "false");
+						System.out.println("Ograniczenie liczbowe min: " + ((((NumberConstraint) constraint).getMinValue() == null)? "null" : ((NumberConstraint) constraint).getMinValue()));
+					}
 				}
-				else{
-					sendString("number");
-					NumberConstraint numbConst = (NumberConstraint) constraint;
-					sendString((numbConst.getMaxValue() == null)? "null" : "" + numbConst.getMaxValue());
-					sendString((numbConst.getMinValue() == null)? "null" : "" + numbConst.getMinValue());
-					sendString((numbConst.getNotEquals() == null)? "null" : "" + numbConst.getNotEquals());
-					sendString((numbConst.isMustBeInteger())? "true" : "false");
-					sendString((numbConst.isNotBetweenMaxAndMinValue())? "true" : "false");
-					System.out.println("Ograniczenie liczbowe min: " + ((((NumberConstraint) constraint).getMinValue() == null)? "null" : ((NumberConstraint) constraint).getMinValue()));
-				}
+				else sendString("nothing"); //brak ograniczeñ
 			}
 			else{
 				sendString(question.toJson());
@@ -732,7 +735,7 @@ public class ConnectionHandler implements Runnable{
 						regex = Pattern.compile(regexS);
 					constraint = new TextConstraint(minLength, maxLength, regex);
 				}
-				else{
+				else if(s.equals("number")){
 					String read;
 					Double maxValue = ((read = readString()).equals("null"))? null : Double.parseDouble(read);
 					Double minValue = ((read = readString()).equals("null"))? null : Double.parseDouble(read);
@@ -741,6 +744,7 @@ public class ConnectionHandler implements Runnable{
 					boolean notBetweenMaxAndMinValue = Boolean.valueOf(readString());
 					constraint = new NumberConstraint(minValue, maxValue, mustBeInteger, notEquals, notBetweenMaxAndMinValue);
 				}
+				else constraint = null;
 				txt.setConstraint(constraint);
 				question = txt;
 			}

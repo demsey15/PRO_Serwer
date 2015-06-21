@@ -1,6 +1,7 @@
 package bohonos.demski.mieldzioc.server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -33,7 +34,10 @@ public class Server {
 	public static void main(String[] args) {
 		Server server = new Server();
 		try {
+			
 			ServerSocket s = new ServerSocket(Server.PORT);
+			System.out.println(s.getInetAddress());
+			System.out.println(InetAddress.getLocalHost());
 			
 			while(true){
 				Socket incoming = s.accept();
