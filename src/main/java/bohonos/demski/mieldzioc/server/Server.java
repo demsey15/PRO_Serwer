@@ -35,7 +35,7 @@ public class Server {
 		Server server = new Server();
 		try {
 			
-			ServerSocket s = new ServerSocket(Server.PORT);
+			ServerSocket s = new ServerSocket();
 			System.out.println(s.getInetAddress());
 			System.out.println(InetAddress.getLocalHost());
 			

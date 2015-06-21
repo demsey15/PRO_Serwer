@@ -752,7 +752,7 @@ public class ConnectionHandler implements Runnable{
 		}
 		return survey;
 	}
-	
+/*	
 	public static void main(String[] args) {
 		Gson gson = new Gson();
 		String s = gson.toJson(new Interviewer("dd", "de", "124", new GregorianCalendar()));
@@ -760,4 +760,5 @@ public class ConnectionHandler implements Runnable{
 		Interviewer i = gson.fromJson(s, Interviewer.class);
 		System.out.println(i);
 	}
+	*/
 }
